@@ -1,7 +1,7 @@
 import { response } from "express";
 import Stripe from "stripe";
-import Transaction from "../models/transactionModel.js";
-import User from "../models/user";
+import Transaction from "../models/transaction.js";
+import User from "../models/user.js";
 
 export const stripeWebhooks = async (req, res) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
