@@ -84,7 +84,7 @@ Designed for: demos, prototypes, teaching samples, and as a foundation for comme
 flowchart LR
   A[User (Browser)] --> B[Frontend (React)]
   B --> C[API Server (Node/Express)]
-  C --> D{Auth & Billing}
+  C --> D[Auth & Billing]
   C --> E[OpenAI (Text & Image)]
   E --> F[ImageKit (CDN & Storage)]
   C --> G[MongoDB]
@@ -95,76 +95,9 @@ flowchart LR
   C --> I
   I --> E
   I --> F
-
-  style A fill:#f9f,stroke:#333,stroke-width:1px
-  style B fill:#bbf,stroke:#333,stroke-width:1px
-  style C fill:#bfb,stroke:#333,stroke-width:1px
-  style E fill:#ffd,stroke:#333,stroke-width:1px
-  style F fill:#efe,stroke:#333,stroke-width:1px
-  style G fill:#eef,stroke:#333,stroke-width:1px
-  style H fill:#fdd,stroke:#333,stroke-width:1px
-  style I fill:#fcc,stroke:#333,stroke-width:1px
 ```
 
 *A compact flowchart showing the core request path: user → frontend → API → OpenAI/ImageKit/DB/Stripe, with background workers for heavy jobs.*
-
-This section describes the high-level system architecture, component responsibilities, data flow, and operational concerns so the project can be deployed, scaled, and maintained in production.
-
-### Components
-
-* **Client (React / Next.js)** — Rich single-page UI that handles user input, displays chat history and images, and talks to backend APIs over HTTPS. Handles optimistic UI updates and local state caching.
-* **API Server (Node.js + Express)** — Central backend that authenticates users, enforces billing/rate limits, orchestrates calls to OpenAI, uploads images to ImageKit, and persists chat & metadata to MongoDB.
-* **Database (MongoDB)** — Stores user profiles, chat sessions/messages, image metadata, usage logs, and billing/credit records.
-* **OpenAI (External Service)** — Provides text and image generation APIs. Accessed only from the backend with the secret API key.
-* **ImageKit (CDN & Storage)** — Hosts generated and user-uploaded images; returns CDN URLs for fast delivery, thumbnails, and transformations.
-* **Stripe (Payments)** — Manages payments, subscriptions, and webhooks to update credits and subscription status.
-* **Caching & Queue (Redis; optional)** — Redis can be used for caching recent responses and implementing an async job queue (e.g., Bull) for long-running image-generation or post-processing tasks.
-* **Monitoring & Logging (e.g., Sentry, Prometheus, Grafana)** — Capture errors, performance metrics, and business metrics (number of generations, latencies, costs).
-* **Webhooks & Background Workers** — Dedicated workers to process Stripe webhooks, post-process images, and run scheduled cleanup or billing reconciliation jobs.
-
-### Data Flow (Sequence)
-
-1. User types a prompt and submits.
-2. Frontend POSTs the request to `/api/chat` including auth token and optional session id.
-3. Backend validates token, checks credits/rate limits, and enqueues the request or calls OpenAI synchronously depending on config.
-4. OpenAI returns text (and/or a generated image payload). If an image is returned as bytes/URL, backend uploads it to ImageKit and stores the CDN URL.
-5. Backend stores message and metadata in MongoDB and returns the composed response to the client.
-6. Client displays the chat reply and image; analytics and usage counters are updated asynchronously.
-
-### Security & Privacy
-
-* Keep OpenAI, ImageKit private keys on the server only.
-* Validate and sanitize user inputs to avoid prompt injection and unsafe content forwarding.
-* Verify Stripe webhooks using the webhook signing secret.
-* Use HTTPS for all traffic and set secure cookie flags (if using cookies). Use JWT or server sessions for auth.
-* Rate-limit endpoints and implement quotas per user to avoid unexpected API costs.
-
-### Scalability & Reliability
-
-* **Horizontal scale**: Stateless API servers behind a load balancer; use shared Redis for session/cache and MongoDB Atlas for managed scaling.
-* **Async image jobs**: Offload image generation and upload to background workers to reduce request latency and retry on failures.
-* **Caching**: Cache repeat prompts/results where applicable to reduce OpenAI calls and cost.
-* **Cost control**: Track token & image usage per user; enforce quotas or billing checks before making expensive OpenAI calls.
-* **Observability**: Instrument request latencies, error rates, and billing metrics. Use alerts for unexpected cost spikes.
-
-### Suggested Endpoints (subset)
-
-* `POST /api/auth/login` — user login
-* `POST /api/auth/register` — create account
-* `POST /api/chat` — send prompt and get chat reply
-* `POST /api/generate-image` — request a dedicated image generation (if separated)
-* `POST /api/upload` — upload user images (sent to ImageKit)
-* `POST /api/stripe/webhook` — Stripe webhook handler
-* `GET /api/history/:userId` — fetch chat history
-
-### Deployment Topology
-
-* Frontend: Vercel (or Netlify). Use edge caching for static assets.
-* Backend: Vercel Serverless Functions (if light), or Render/Railway/Heroku/EC2 for persistent workers and webhook reliability.
-* Database: MongoDB Atlas with multi-region replicas for lower-latency reads.
-* Redis/Queue: Managed Redis for job queues (e.g., Upstash, Redis Labs).
-
----
 
 ## Deployment Notes
 
