@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import Chat from "../models/chat.js"; // Add this import
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -58,7 +59,7 @@ export const loginUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try{
-        const userId = req.user.id;  // Move this line inside the function
+        const userId = req.user.id;
         const user = await User.findById(userId).select('-password');
         res.json({success: true , user})
     }
@@ -70,9 +71,11 @@ export const getUser = async (req, res) => {
 
 export const getPublishedImages = async (req, res) => {
     try{
+        console.log("Fetching published images..."); // Debug log
+        
         const publishedImageMessages = await Chat.aggregate([
             { $unwind: "$messages" },
-            { $match: { "messages.isImage": true, "messages.isPublic": true } },
+            { $match: { "messages.isImage": true, "messages.isPublished": true } }, // Change isPublic to isPublished
             { $project: {
                     _id: 0,
                     imageUrl: "$messages.content",
@@ -81,10 +84,14 @@ export const getPublishedImages = async (req, res) => {
             }
         ]);
 
+        console.log("Found published images:", publishedImageMessages.length); // Debug log
+        console.log("Published images data:", publishedImageMessages); // Debug log
+
         res.json({ success: true, images: publishedImageMessages.reverse() });
     }
     catch(error)
     {
+        console.error("getPublishedImages error:", error); // Debug log
         return res.json({success: false , message: error.message})
     }
 };

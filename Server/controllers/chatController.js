@@ -36,7 +36,7 @@ export const deleteChat = async (req, res) => {
     try{
         const userId = req.user.id;
         const { chatId } = req.body;
-        await Chat.findByIdAndDelete({id: chatId , userId});
+        await Chat.findByIdAndDelete({_id: chatId , userId});
         res.json({success: true , message : "Chat deleted successfully"});
     }
     catch(error)
