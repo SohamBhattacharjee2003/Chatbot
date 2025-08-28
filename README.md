@@ -2,7 +2,6 @@
 
 **Repository:** `SohamBhattacharjee2003/Chatbot`
 
-**Live demo:** [https://chatbot-woad-iota.vercel.app/](https://chatbot-woad-iota.vercel.app/)
 
 ---
 
@@ -78,26 +77,6 @@ Designed for: demos, prototypes, teaching samples, and as a foundation for comme
 5. Stripe handles purchases; server verifies Stripe webhooks to grant credits/subscriptions.
 6. Chat history and usage metrics are recorded in MongoDB.
 
-## System Architecture
-
-```mermaid
-flowchart LR
-  A[User (Browser)] --> B[Frontend (React)]
-  B --> C[API Server (Node/Express)]
-  C --> D[Auth & Billing]
-  C --> E[OpenAI (Text & Image)]
-  E --> F[ImageKit (CDN & Storage)]
-  C --> G[MongoDB]
-  C --> H[Stripe]
-  subgraph Workers
-    I[Background Workers / Queue (Redis + Bull)]
-  end
-  C --> I
-  I --> E
-  I --> F
-```
-
-*A compact flowchart showing the core request path: user → frontend → API → OpenAI/ImageKit/DB/Stripe, with background workers for heavy jobs.*
 
 ## Deployment Notes
 
