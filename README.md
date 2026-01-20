@@ -140,28 +140,3 @@ Thanks for considering contributions! A recommended CONTRIBUTING.md workflow:
 4. Open a pull request with a clear description
 
 Please follow consistent formatting and linting. Add tests or manual reproduction steps for bug fixes.
-
----
-
-## License
-
-Suggested: **MIT License** — lightweight and permissive. Add a `LICENSE` file if you choose it.
-
----
-
-## Contact
-
-Maintainer: **Soham Bhattacharjee**
-
-* GitHub: `https://github.com/SohamBhattacharjee2003`
-* Live demo: [https://chatbot-woad-iota.vercel.app/](https://chatbot-woad-iota.vercel.app/)
-
----
-
-If you'd like, I can:
-
-* generate a `README.md` file you can copy/paste or commit directly,
-* craft a shorter `GitHub repository description` and `README` banner (badges + one-line), or
-* produce a polished `CONTRIBUTING.md`, `SECURITY.md`, or `ISSUE_TEMPLATE.md` next.
-
-Tell me which of the above you'd like next and I'll add it directly to the repo content.
